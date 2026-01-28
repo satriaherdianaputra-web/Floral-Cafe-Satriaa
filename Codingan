@@ -1,0 +1,198 @@
+print("=== FLORAL CAFE ===")
+
+# ===============================
+# LIST MENU
+# ===============================
+menu_makanan = {
+    1: ("French Fries", 10000),
+    2: ("Udang Garlic Sauce", 7000),
+    3: ("Chicken Wings", 17000),
+    4: ("Nasi Goreng", 15000),
+    5: ("Ayam Geprek", 25000),
+}
+
+menu_minuman = {
+    6: ("Mactha Rose Latte", 12000),
+    7: ("Americanno", 8000),
+    8: ("Hazelnut", 13000),
+    9: ("Thai Tea", 13000),
+    10: ("Jamu", 15000)
+}
+
+menu = {**menu_makanan, **menu_minuman}
+pesanan = {}
+
+# ===============================
+# TAMPILKAN MENU
+# ===============================
+print("\n--- MENU MAKANAN ---")
+for k, v in menu_makanan.items():
+    print(f"{k}. {v[0]} - Rp{v[1]}")
+
+print("\n--- MENU MINUMAN ---")
+for k, v in menu_minuman.items():
+    print(f"{k}. {v[0]} - Rp{v[1]}")
+
+# ===============================
+# PILIH MENU
+# ===============================
+while True:
+    pilihan = input("\nPilih menu (contoh 1,3,10): ").split(",")
+
+    for p in pilihan:
+        try:
+            p = int(p.strip())
+            if p in menu:
+                jumlah = int(input(f"Jumlah {menu[p][0]}: "))
+                if jumlah > 0:
+                    pesanan[p] = pesanan.get(p, 0) + jumlah
+                else:
+                    print("Pesenlah Jan 0")
+            else:
+                print("Menu tidak tersedia")
+        except ValueError:
+            print("Input tidak valid")
+
+    tambah = input("Tambah pesanan lagi? (y/t): ").lower()
+    while tambah not in ("y", "t"):
+        tambah = input("Masukkan y atau t saja: ").lower()
+
+    if tambah == "t":
+        break
+
+# ===============================
+# CEK PESANAN
+# ===============================
+if not pesanan:
+    print("\nPesanan kosong. Transaksi dibatalkan.")
+    exit()
+
+# ===============================
+# MAKAN DI TEMPAT
+# ===============================
+makan_di_tempat = input("\nMakan di tempat? (y/t): ").lower()
+while makan_di_tempat not in ("y", "t"):
+    makan_di_tempat = input("Masukkan y atau t saja: ").lower()
+
+# ===============================
+# HITUNG TOTAL
+# ===============================
+total_harga = sum(menu[p][1] * jml for p, jml in pesanan.items())
+
+# ===============================
+# PEMBAYARAN
+# ===============================
+while True:
+    print("\n=== RINGKASAN PESANAN ===")
+    for p, jml in pesanan.items():
+        print(f"{menu[p][0]} x{jml} = Rp{menu[p][1] * jml}")
+    print(f"Total Bayar: Rp{total_harga}")
+
+    metode = input("\nMetode pembayaran (cash/smart pay): ").lower()
+
+    # ---------- CASH ----------
+    if metode == "cash":
+        total_uang = 0
+
+        while True:
+            try:
+                uang = int(input("Masukkan uang: "))
+                if uang <= 0:
+                    print("Uang harus lebih dari 0")
+                    continue
+                total_uang += uang
+            except ValueError:
+                print("Masukkan angka")
+                continue
+
+            if total_uang >= total_harga:
+                kembalian = total_uang - total_harga
+                break
+
+            kurang = total_harga - total_uang
+            print(f"Uang kurang Rp{kurang}")
+            print("1. Tambah uang")
+            print("2. Kurangi pesanan")
+
+            opsi = input("Pilih (1/2): ")
+
+            if opsi == "1":
+                continue
+
+            elif opsi == "2":
+                try:
+                    kode = int(input("Masukkan nomer menu: "))
+                    if kode in pesanan:
+                        jml = int(input("Jumlah yang dikurangi: "))
+
+                        if jml >= pesanan[kode]:
+                            del pesanan[kode]
+                        else:
+                            pesanan[kode] -= jml
+
+                        if not pesanan:
+                            print("Pesanan kosong. Transaksi dibatalkan.")
+                            exit()
+
+                        total_harga = sum(menu[p][1] * j for p, j in pesanan.items())
+                        total_uang = 0
+                        print("Pesanan diubah.")
+                    else:
+                        print("Menu tidak ada")
+                except ValueError:
+                    print("Input tidak valid")
+
+            elif opsi == "3":
+                print("Transaksi dibatalkan.")
+                exit()
+            else:
+                print("Pilihan tidak valid")
+
+        break
+
+    # ---------- SMART PAY ----------
+    elif metode == "smart pay":
+        print(f"Total tagihan: Rp{total_harga}")
+        berhasil = input("Pembayaran berhasil? (y/t): ").lower()
+        while berhasil not in ("y", "t"):
+            berhasil = input("Masukkan y atau t saja: ").lower()
+
+        if berhasil == "y":
+            kembalian = 0
+            break
+        else:
+            print("Pembayaran gagal")
+
+    else:
+        print("Metode tidak valid")
+
+# ===============================
+# STRUK PEMBAYARAN
+# ===============================
+print("\n===== STRUK PEMBAYARAN =====")
+for p, jml in pesanan.items():
+    print(f"{menu[p][0]} x{jml} = Rp{menu[p][1] * jml}")
+print(f"Total    : Rp{total_harga}")
+print(f"Metode   : {metode}")
+if metode == "cash":
+    print(f"Kembalian: Rp{kembalian}")
+print("Pesanan  : Dine In" if makan_di_tempat == "y" else "Pesanan  : Take Away")
+print("=== TERIMA KASIH ===")
+
+# ===============================
+# PROSES AKHIR PESANAN
+# ===============================
+import time
+
+print("\n=== STATUS PESANAN ===")
+print("Pesanan sedang diproses di dapur...")
+time.sleep(2)
+
+print("Pesanan selesai dibuat ")
+
+if makan_di_tempat == "y":
+    print("Pesanan diantar ke meja pelanggan ")
+else:
+    print("Pesanan diambil oleh pelanggan ")
+
+print("\n=== TRANSAKSI SELESAI ===")
